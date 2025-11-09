@@ -3,20 +3,47 @@
 
 # 1. Escreva um programa que soma dois números inteiros inseridos pelo usuário.
 
-numero_1 = float(input("Por favor insira o primeiro número para soma: "))
-numero_2 = float(input("Por favor insira o segundo número para a soma: "))
-resultado = numero_1 + numero_2
+# numero_1 = float(input("Por favor insira o primeiro número para soma: "))
+# numero_2 = float(input("Por favor insira o segundo número para a soma: "))
+# resultado = numero_1 + numero_2
 
-if resultado.is_integer():
-    print(f"A soma dos dois números é {int(resultado)}")
-else:
-    print(f"A soma dos dois números é {resultado}")
-
-
-
+# if resultado.is_integer():
+#     print(f"A soma dos dois números é {int(resultado)}")
+# else:
+#     print(f"A soma dos dois números é {resultado}")
 
 
 # 2. Crie um programa que receba um número do usuário e calcule o resto da divisão desse número por 5.
+
+
+import traceback
+
+while True:
+    try:
+        resto_1 = float(input("Por favor insira um número para o cálculo de resto 5: "))
+        resultado_resto_1 = resto_1 % 5
+
+        if resultado_resto_1.is_integer():
+            print(f"O resto da conta é: {int(resultado_resto_1)}")
+            break
+        else:
+            print(f"{resultado_resto_1:.2f}")
+            break
+
+    except Exception as e:
+        print("Ocorreu um erro:")
+        traceback.print_exc()
+
+        resposta= input("\nDeseja tentar novamente? (s/n): ").strip().lower()
+
+        if resposta != "s":
+            print("Programa encerrado. Até mais!")
+            break
+        else:
+            print("\nReiniciando programa")
+
+
+
 # 3. Desenvolva um programa que multiplique dois números fornecidos pelo usuário e mostre o resultado.
 # 4. Faça um programa que peça dois números inteiros e imprima a divisão inteira do primeiro pelo segundo.
 # 5. Escreva um programa que calcule o quadrado de um número fornecido pelo usuário.
