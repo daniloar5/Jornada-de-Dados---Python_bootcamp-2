@@ -47,29 +47,101 @@ import traceback
 
 
 
-while True:
-    try:
-        multi_1 = float(input("Digite o primeiro número da multplicação: "))
-        multi_2 = float(input("Digite o segundo número da multplicação: "))
-        resultado_multi = multi_1 * multi_2
 
-        if resultado_multi.is_integer():
-            print(f"O resultado da multiplicação é: {int(resultado_multi)}")
-            break
+import re
+
+def parse_num(s):
+
+    if s is None:
+        raise ValueError("Entrada vazia")
+
+    s = s.strip()
+    if s == "":
+        raise ValueError("Entrada vazia")
+    # remove espaços dentro (ex: "1 000,50")
+    s = s.replace(" ", "")
+
+    # aceita sinal
+    sign = ""
+    if s.startswith(("+", "-")):
+        sign = s[0]
+        s = s[1:]
+
+    # só caracteres esperados
+    if not re.match(r'^[0-9\.,]+$', s):
+        raise ValueError(f"Formato inválido: {s}")
+
+    has_comma = "," in s
+    has_dot = "." in s
+
+    if has_comma and has_dot:
+        # ex: 1.234.567,89  -> remove pontos, troca vírgula por ponto
+        s = s.replace(".", "")
+        s = s.replace(",", ".")
+    elif has_comma:
+        # ex: 1500,6 -> 1500.6
+        s = s.replace(",", ".")
+    elif has_dot:
+        # somente pontos
+        parts = s.split(".")
+        if len(parts) > 2:
+            # muitos pontos: tratar como milhares exceto, possivelmente, o último
+            # verificar última parte: se tem 3 dígitos -> provavelmente milhares
+            if len(parts[-1]) == 3:
+                # todos pontos são separadores de milhar -> remover todos
+                s = "".join(parts)
+            else:
+                # tratar último como decimal, juntar os anteriores como milhares
+                s = "".join(parts[:-1]) + "." + parts[-1]
         else:
-            print(f"O resultado da multiplicação é: {resultado_multi}")
-            break
-    except:
-        print("Aconteceu um erro: ")
-        traceback.print_exc()
+            # exatamente um ponto
+            left, right = parts[0], parts[1]
+            if len(right) == 3 and len(left) <= 3:
+                # ex: 5.444 -> muito provavelmente 5444 (ponto de milhar)
+                s = left + right
+            else:
+                # ex: 5.44 -> decimal
+                s = left + "." + right
 
-        resposta_multi= input("\nDeseja tentar novamente? (s/n): ").strip().lower()
+    # recoloca sinal e converte
+    s = sign + s
+    return float(s)
 
-        if resposta_multi != "s":
-            print("Programa encerrado. Até mais!")
+
+def format_result(x):
+    # se for inteiro dentro de uma tolerância, mostra sem casas
+    if abs(x - round(x)) < 1e-9:
+        return str(int(round(x)))
+    # remove zeros desnecessários
+    text = f"{x:.10f}".rstrip("0").rstrip(".")
+    return text
+
+
+if __name__ == "__main__":
+    while True:
+        try:
+            a_raw = input("Digite o primeiro número da multiplicação: ")
+            b_raw = input("Digite o segundo número da multiplicação: ")
+
+            a = parse_num(a_raw)
+            b = parse_num(b_raw)
+
+            resultado_multi = a * b
+
+            print("Valores interpretados: ", a, "x", b)
+            print("O resultado da multiplicação é:", format_result(resultado_multi))
             break
-        else:
-            print("\nReiniciando programa")
+
+        except Exception as e:
+            print("Aconteceu um erro:", e)
+            traceback.print_exc()
+            resposta_multi = input("\nDeseja tentar novamente? (s/n): ").strip().lower()
+            if resposta_multi != "s":
+                print("Programa encerrado. Até mais!")
+                break
+            else:
+                print("\nReiniciando programa...")
+
 
 # 4. Faça um programa que peça dois números inteiros e imprima a divisão inteira do primeiro pelo segundo.
 # 5. Escreva um programa que calcule o quadrado de um número fornecido pelo usuário.
